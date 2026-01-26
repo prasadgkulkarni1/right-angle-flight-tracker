@@ -850,3 +850,12 @@ Key next steps would be persistent storage, continuous tracking, and production 
 ---
 
 **Ready for next session**: This project is thoroughly documented, comprehensively tested, and structured for future Claude Code sessions to continue building features, fixing bugs, or refactoring as needed.
+
+## TODO:
+
+- Show alternative flight results upto 5 flights that satisfy the search criteria
+- Add payment gateway so that users can book the flights using Amedeus booking API
+- Add user authentication so that users can save their search history and flight bookings. Preferably add OAuth 2.0 based authentication like Google, Facebook etc
+- Add support for multiple currencies
+- Add support for multiple languages
+
