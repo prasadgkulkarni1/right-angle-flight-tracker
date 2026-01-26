@@ -14,8 +14,11 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Track flight prices.")
 
+    # Add list-providers option
+    parser.add_argument("--list-providers", action="store_true", help="List all available providers and exit")
+
     # Create mutually exclusive group for structured vs natural language input
-    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group = parser.add_mutually_exclusive_group(required=False)
     input_group.add_argument("--query", type=str, help="Natural language query (e.g., 'Find flights from SYD to BLR on June 1 under $500')")
     input_group.add_argument("--origin", type=str, help="Origin airport code (e.g., SFO)")
 
@@ -28,8 +31,7 @@ def main():
     parser.add_argument("--provider", type=str, default=None,
                         choices=available_providers if available_providers else ["mock"],
                         help=f"Data provider (default: auto-detect). Available: {', '.join(available_providers) if available_providers else 'mock'}")
-    parser.add_argument("--list-providers", action="store_true", help="List all available providers and exit")
-    
+
     args = parser.parse_args()
 
     # Handle list-providers command
@@ -55,6 +57,10 @@ def main():
         print(f"\nUse --provider <id> to select a provider")
         print(f"Example: --provider amadeus\n")
         sys.exit(0)
+
+    # Validate that input is required for actual search
+    if not args.query and not args.origin:
+        parser.error("one of the arguments --query --origin is required")
 
     # Parse natural language query if provided
     if args.query:
