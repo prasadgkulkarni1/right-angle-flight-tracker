@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/prasadkulkarni/.gemini/antigravity/playground/binary-aldrin"
+    ],
+    "allow": [
+      "Bash(python run_tests.py:*)"
+    ]
+  }
+}

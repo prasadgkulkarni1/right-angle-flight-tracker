@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✈️ Flight Tracker - Find Your Perfect Flight</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">✈️</span>
+                    <h1>Flight Tracker</h1>
+                </div>
+                <div class="provider-selector">
+                    <label for="providerSelect" class="provider-label">Flight Data Provider:</label>
+                    <select id="providerSelect" class="provider-select">
+                        <option value="">Loading providers...</option>
+                    </select>
+                    <span id="providerStatus" class="provider-status"></span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="search-section">
+                <h2 class="search-title">Find Your Perfect Flight</h2>
+                <p class="search-subtitle">Search flights using natural language - Try "Sydney to Singapore in June
+                    under $1200"</p>
+
+                <div class="search-box">
+                    <textarea id="queryInput"
+                        placeholder="e.g., Find return flights from Sydney to Bangalore in June under AUD 1200..."
+                        rows="1"></textarea>
+                    <button id="sendBtn" class="send-btn">
+                        <span>Search Flights</span>
+                    </button>
+                </div>
+
+                <div class="example-section">
+                    <div class="example-label">Popular searches</div>
+                    <div class="example-queries">
+                        <button class="example-btn"
+                            onclick="fillExample('Find return flights from Sydney to Bangalore in June under AUD 1200')">
+                            SYD → BLR, June, AUD 1200
+                        </button>
+                        <button class="example-btn"
+                            onclick="fillExample('Return flights SFO to JFK for Christmas under $800')">
+                            SFO → JFK, Christmas, $800
+                        </button>
+                        <button class="example-btn"
+                            onclick="fillExample('Flights from London to Paris on July 15, max EUR 200')">
+                            LHR → CDG, July 15, EUR 200
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <!-- Results will appear here -->
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

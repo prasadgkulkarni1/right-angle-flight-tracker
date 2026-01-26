@@ -1,0 +1,7 @@
+Stats tracking flight from SFO to JFK on 2023-12-25. Target: $2000.0
+Current price: $133.46
+
+==================================================
+NOTIFICATION SENT: ALERT! Price dropped! Flight SFO->JFK on 2023-12-25 is now $133.46 (Target: $2000.0)
+==================================================
+
