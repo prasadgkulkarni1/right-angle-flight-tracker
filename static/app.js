@@ -144,23 +144,23 @@ async function sendQuery() {
 
 async function pollStatus() {
     if (!currentSearchId) return;
-    
+
     try {
         const response = await fetch(`/api/status/${currentSearchId}`);
         const data = await response.json();
-        
+
         // Check status
         if (data.status === 'complete') {
-            if (data.result) {
-                displayFlightCard(data.result);
+            if (data.results && data.results.length > 0) {
+                displayFlightCards(data.results);
             } else {
                 showError('No flights found for your search criteria');
             }
             resetSearchButton();
             currentSearchId = null;
         } else if (data.status === 'error') {
-            const errorMsg = data.messages && data.messages.length > 0 
-                ? data.messages[data.messages.length - 1].content 
+            const errorMsg = data.messages && data.messages.length > 0
+                ? data.messages[data.messages.length - 1].content
                 : 'An error occurred';
             showError(errorMsg);
             resetSearchButton();
@@ -189,10 +189,98 @@ function showError(message) {
     resultsContainer.appendChild(errorDiv);
 }
 
-function displayFlightCard(flight) {
+// Store current flights for sorting
+let currentFlights = [];
+
+function displayFlightCards(flights) {
+    // Store flights for sorting
+    currentFlights = flights;
+
+    // Clear previous results
+    resultsContainer.innerHTML = '';
+
+    // Add results header
+    const header = document.createElement('div');
+    header.className = 'results-header';
+    header.innerHTML = `
+        <h3 class="results-count">Found ${flights.length} flight${flights.length > 1 ? 's' : ''}</h3>
+        <div class="sort-controls">
+            <button onclick="sortFlights('price')" class="sort-btn active" id="sortByPrice">
+                Price (Low to High)
+            </button>
+            ${flights.some(f => f.duration) ? `
+                <button onclick="sortFlights('duration')" class="sort-btn" id="sortByDuration">
+                    Duration
+                </button>
+            ` : ''}
+        </div>
+    `;
+    resultsContainer.appendChild(header);
+
+    // Display each flight card
+    flights.forEach((flight, index) => {
+        displayFlightCard(flight, index);
+    });
+
+    // Scroll to results
+    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function sortFlights(criteria) {
+    // Update active button
+    document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+
+    if (criteria === 'price') {
+        currentFlights.sort((a, b) => a.price - b.price);
+        document.getElementById('sortByPrice')?.classList.add('active');
+    } else if (criteria === 'duration') {
+        currentFlights.sort((a, b) => {
+            const durationA = parseDuration(a.duration);
+            const durationB = parseDuration(b.duration);
+            return durationA - durationB;
+        });
+        document.getElementById('sortByDuration')?.classList.add('active');
+    }
+
+    displayFlightCards(currentFlights);
+}
+
+function parseDuration(duration) {
+    if (!duration) return 0;
+
+    // Handle ISO 8601 duration format (e.g., "PT13H30M")
+    if (duration.startsWith('PT')) {
+        const hours = duration.match(/(\d+)H/);
+        const minutes = duration.match(/(\d+)M/);
+        return (hours ? parseInt(hours[1]) : 0) * 60 + (minutes ? parseInt(minutes[1]) : 0);
+    }
+
+    // Handle simple format (e.g., "13h 30m")
+    const hours = duration.match(/(\d+)h/);
+    const minutes = duration.match(/(\d+)m/);
+    return (hours ? parseInt(hours[1]) : 0) * 60 + (minutes ? parseInt(minutes[1]) : 0);
+}
+
+function formatDuration(duration) {
+    if (!duration) return 'N/A';
+
+    // Handle ISO 8601 duration format (e.g., "PT13H30M")
+    if (duration.startsWith('PT')) {
+        const hours = duration.match(/(\d+)H/);
+        const minutes = duration.match(/(\d+)M/);
+        const h = hours ? parseInt(hours[1]) : 0;
+        const m = minutes ? parseInt(minutes[1]) : 0;
+        return m > 0 ? `${h}h ${m}m` : `${h}h`;
+    }
+
+    // Already in simple format
+    return duration;
+}
+
+function displayFlightCard(flight, index = 0) {
     const card = document.createElement('div');
     card.className = 'flight-card';
-    
+
     // Build price display with conversion info if available
     let priceHTML = `<div class="flight-price">${flight.currency} ${flight.price}</div>`;
     if (flight.original_currency && flight.original_currency !== flight.currency) {
@@ -200,13 +288,22 @@ function displayFlightCard(flight) {
     } else {
         priceHTML += `<div class="price-subtitle">Total price for ${flight.trip_type}</div>`;
     }
-    
+
+    // Add "Best Deal" badge for the cheapest flight (first in sorted list)
+    const bestDealBadge = index === 0 ? '<span class="badge badge-best">Best Deal</span>' : '';
+
+    // Format stops display
+    const stopsText = flight.stops !== undefined
+        ? (flight.stops === 0 ? 'Direct' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`)
+        : '';
+
     card.innerHTML = `
         <div class="flight-header">
             <div class="flight-price-section">
                 ${priceHTML}
             </div>
             <div class="flight-badges">
+                ${bestDealBadge}
                 <span class="badge badge-type">${flight.trip_type}</span>
             </div>
         </div>
@@ -228,14 +325,25 @@ function displayFlightCard(flight) {
                     <div class="detail-value">${formatDate(flight.return_date)}</div>
                 </div>
             ` : ''}
+            ${flight.duration ? `
+                <div class="detail-item">
+                    <div class="detail-label">Duration</div>
+                    <div class="detail-value">${formatDuration(flight.duration)}</div>
+                </div>
+            ` : ''}
+            ${stopsText ? `
+                <div class="detail-item">
+                    <div class="detail-label">Stops</div>
+                    <div class="detail-value">${stopsText}</div>
+                </div>
+            ` : ''}
         </div>
         <button class="book-btn" onclick="window.open('${flight.booking_url}', '_blank')">
             Book Flight
         </button>
     `;
-    
+
     resultsContainer.appendChild(card);
-    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function formatDate(dateStr) {

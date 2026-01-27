@@ -53,7 +53,7 @@ def search_flights():
         search_results[search_id] = {
             'status': 'parsing',
             'messages': [],
-            'result': None
+            'results': []  # Changed to array for multiple results
         }
     
     def run_search():
@@ -118,57 +118,90 @@ def search_flights():
             
             # We'll do a single check instead of continuous tracking
             try:
-                
-                # Get flight details directly
+
+                # Get flight details directly - now returns multiple results
                 return_date = params.get('return_date')
                 target_price = params.get('target_price')
                 target_currency = params.get('target_currency', 'USD')
-                
-                flight_details = tool.get_price(
+
+                flight_results = tool.get_prices(
                     params['origin'],
                     params['destination'],
                     params['date'],
-                    return_date
+                    return_date,
+                    max_results=5
                 )
-                
-                if flight_details and flight_details.get('status') == 'AVAILABLE':
-                    # Check if price is within target
-                    flight_price = flight_details.get('price', 0)
-                    flight_currency = flight_details.get('currency', 'USD')
-                    
-                    # Price should already be in target currency if conversion was done
-                    # But double-check the currency matches
-                    if flight_currency == target_currency:
-                        price_under_target = flight_price <= target_price
-                    else:
-                        # If currencies don't match, convert for comparison
-                        try:
-                            from forex_python.converter import CurrencyRates
-                            c = CurrencyRates()
-                            converted_price = c.convert(flight_currency, target_currency, flight_price)
-                            price_under_target = converted_price <= target_price
-                        except:
-                            # If conversion fails, just compare raw numbers
-                            price_under_target = flight_price <= target_price
-                    
-                    if price_under_target:
+
+                if flight_results:
+                    # If no target price specified, show all results
+                    if target_price is None:
                         with search_lock:
                             search_results[search_id]['status'] = 'complete'
-                            search_results[search_id]['result'] = flight_details
+                            search_results[search_id]['results'] = flight_results[:5]
+
+                            lowest_price = flight_results[0].get('price', 0)
+                            lowest_currency = flight_results[0].get('currency', 'USD')
+
                             search_results[search_id]['messages'].append({
                                 'type': 'success',
-                                'content': f'Flight found for {flight_currency} {flight_price}!'
+                                'content': f'Found {len(flight_results)} flight{"s" if len(flight_results) > 1 else ""}! Lowest price: {lowest_currency} {lowest_price}'
                             })
                     else:
+                        # Filter flights by target price
+                        matching_flights = []
+
+                        for flight in flight_results:
+                            flight_price = flight.get('price', 0)
+                            flight_currency = flight.get('currency', 'USD')
+
+                            # Price should already be in target currency if conversion was done
+                            # But double-check the currency matches
+                            if flight_currency == target_currency:
+                                price_under_target = flight_price <= target_price
+                            else:
+                                # If currencies don't match, convert for comparison
+                                try:
+                                    from forex_python.converter import CurrencyRates
+                                    c = CurrencyRates()
+                                    converted_price = c.convert(flight_currency, target_currency, flight_price)
+                                    price_under_target = converted_price <= target_price
+                                except:
+                                    # If conversion fails, just compare raw numbers
+                                    price_under_target = flight_price <= target_price
+
+                            if price_under_target:
+                                matching_flights.append(flight)
+
+                        # Store results
                         with search_lock:
                             search_results[search_id]['status'] = 'complete'
-                            search_results[search_id]['messages'].append({
-                                'type': 'warning',
-                                'content': f'No flights found under {target_currency} {target_price}. Lowest price found: {flight_currency} {flight_price}'
-                            })
+
+                            if matching_flights:
+                                # Store all matching flights
+                                search_results[search_id]['results'] = matching_flights
+
+                                lowest_price = matching_flights[0].get('price', 0)
+                                lowest_currency = matching_flights[0].get('currency', 'USD')
+
+                                search_results[search_id]['messages'].append({
+                                    'type': 'success',
+                                    'content': f'Found {len(matching_flights)} flight{"s" if len(matching_flights) > 1 else ""} under {target_currency} {target_price}! Lowest: {lowest_currency} {lowest_price}'
+                                })
+                            else:
+                                # No flights under target price, but show all results anyway
+                                search_results[search_id]['results'] = flight_results[:5]  # Limit to 5
+
+                                lowest_price = flight_results[0].get('price', 0)
+                                lowest_currency = flight_results[0].get('currency', 'USD')
+
+                                search_results[search_id]['messages'].append({
+                                    'type': 'info',
+                                    'content': f'No flights found under {target_currency} {target_price}. Showing {len(flight_results)} available option{"s" if len(flight_results) > 1 else ""}. Lowest: {lowest_currency} {lowest_price}'
+                                })
                 else:
                     with search_lock:
                         search_results[search_id]['status'] = 'complete'
+                        search_results[search_id]['results'] = []
                         search_results[search_id]['messages'].append({
                             'type': 'warning',
                             'content': 'No flights available'

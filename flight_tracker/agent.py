@@ -32,19 +32,23 @@ class PriceTrackerAgent:
         prompt = f"""Extract flight search parameters from this query: "{query}"
 
 Return a JSON object with these exact keys:
-- origin: 3-letter IATA airport code (e.g., SYD, SFO)
-- destination: 3-letter IATA airport code (e.g., BLR, JFK)
-- date: Departure date in YYYY-MM-DD format
-- return_date: Return date in YYYY-MM-DD format (null for one-way)
-- target_price: Maximum price as a number (no currency symbol)
-- target_currency: 3-letter currency code (e.g., USD, AUD, EUR). Use "USD" as default if not specified.
-- preferred_airlines: Array of airline codes or null (e.g., ["QF", "SQ"] for Qantas and Singapore Airlines)
-- max_duration: Maximum flight duration in hours or null (extract from phrases like "under 15 hours", "max 10 hours")
+- origin: 3-letter IATA airport code (e.g., SYD, SFO) [REQUIRED]
+- destination: 3-letter IATA airport code (e.g., BLR, JFK) [REQUIRED]
+- date: Departure date in YYYY-MM-DD format [REQUIRED]
+- return_date: Return date in YYYY-MM-DD format (null for one-way) [OPTIONAL]
+- target_price: Maximum price as a number (no currency symbol, null if not specified) [OPTIONAL]
+- target_currency: 3-letter currency code (e.g., USD, AUD, EUR). Use "USD" as default if not specified. [OPTIONAL]
+- preferred_airlines: Array of airline codes or null (e.g., ["QF", "SQ"] for Qantas and Singapore Airlines) [OPTIONAL]
+- max_duration: Maximum flight duration in hours or null (extract from phrases like "under 15 hours", "max 10 hours") [OPTIONAL]
+
+IMPORTANT: Only origin, destination, and date are required. All other fields are optional and should be null if not mentioned in the query.
 
 For date ranges like "first week of June", use the START of the range for 'date'.
 For return flights mentioned as ranges, use the END of the range for 'return_date'.
 
 Examples:
+- "Find flights from Sydney to Bangalore on June 1st 2026" → {{"origin": "SYD", "destination": "BLR", "date": "2026-06-01", "return_date": null, "target_price": null, "target_currency": "USD", "preferred_airlines": null, "max_duration": null}}
+- "Flights from NYC to London next Monday" → {{"origin": "JFK", "destination": "LHR", "date": "2026-02-02", "return_date": null, "target_price": null, "target_currency": "USD", "preferred_airlines": null, "max_duration": null}}
 - "Find flights from Sydney to Bangalore on June 1st 2026 under 500" → {{"origin": "SYD", "destination": "BLR", "date": "2026-06-01", "return_date": null, "target_price": 500, "target_currency": "USD", "preferred_airlines": null, "max_duration": null}}
 - "Return flights SYD to BLR from 01/06/2026 to 10/06/2026 under AUD 900 on Qantas or Emirates" → {{"origin": "SYD", "destination": "BLR", "date": "2026-06-01", "return_date": "2026-06-10", "target_price": 900, "target_currency": "AUD", "preferred_airlines": ["QF", "EK"], "max_duration": null}}
 - "Find return flights from Sydney to Bangalore in June under EUR 800, max 15 hours flight time" → {{"origin": "SYD", "destination": "BLR", "date": "2026-06-01", "return_date": "2026-06-30", "target_price": 800, "target_currency": "EUR", "preferred_airlines": null, "max_duration": 15}}
@@ -66,12 +70,18 @@ Return ONLY the JSON object, no other text."""
         except json.JSONDecodeError:
             raise ValueError(f"Could not parse query. Claude returned: {result_text}")
         
-        # Validate required fields
-        required = ["origin", "destination", "date", "target_price"]
+        # Validate required fields (only origin, destination, and date are required)
+        required = ["origin", "destination", "date"]
         missing = [k for k in required if not params.get(k)]
         if missing:
             raise ValueError(f"Could not extract these parameters from query: {', '.join(missing)}")
-        
+
+        # Set defaults for optional fields
+        if "target_price" not in params or params["target_price"] is None:
+            params["target_price"] = None  # Will show all results
+        if "target_currency" not in params or not params["target_currency"]:
+            params["target_currency"] = "USD"
+
         return params
     
     def __init__(self, tool: FlightTool, model_name: str = "claude-opus-4-5", check_interval_seconds: int = 5):

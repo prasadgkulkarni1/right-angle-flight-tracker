@@ -12,10 +12,10 @@
 **Framework**: Google Antigravity
 **Primary AI**: Anthropic Claude Opus 4.5
 **Status**: MVP Complete ✅
-**Last Updated**: January 26, 2026
+**Last Updated**: January 27, 2026
 
 ### Purpose
-An intelligent flight price tracking system that uses natural language processing to understand user queries and search for flights using either mock data or real Amadeus API data. The system can track prices and notify users when deals matching their criteria are found.
+An intelligent flight price tracking system that uses natural language processing to understand user queries and search for flights using either mock data or real Amadeus API data. The system displays up to 5 flight options per search, sorted by price, with optional price filtering. Users can compare flights by price, duration, and stops, making it easy to find the best deal.
 
 ---
 
@@ -191,6 +191,99 @@ An intelligent flight price tracking system that uses natural language processin
   - Performance notes
   - Future enhancement suggestions
 - ✅ Created this development history (CLAUDE.md)
+
+### Phase 7: Multiple Flight Results & Enhanced UX (Completed - January 27, 2026)
+
+#### 7.1 Multiple Flight Results
+- ✅ Added `get_prices()` method to FlightProvider base class ([flight_tracker/flight_data.py](flight_tracker/flight_data.py:28-42))
+  - Returns list of up to 5 flights instead of single result
+  - Sorted by price (lowest to highest)
+  - Maintains backward compatibility with `get_price()`
+- ✅ Implemented `get_prices()` in MockFlightProvider ([flight_tracker/flight_data.py](flight_tracker/flight_data.py:77-140))
+  - Generates 5 flights with varying prices (±30% variation)
+  - Random airline selection from pool of 10 airlines
+  - Random durations (2-20 hours)
+  - Random stops (0, 1, or 2 with bias toward direct)
+- ✅ Implemented `get_prices()` in AmadeusFlightProvider ([flight_tracker/flight_data.py](flight_tracker/flight_data.py:182-278))
+  - Requests up to 5 results from Amadeus API
+  - Extracts duration and stops count
+  - Stores raw offer data for future booking integration
+  - Handles currency conversion for all results
+- ✅ Updated FlightTool wrapper ([flight_tracker/flight_data.py](flight_tracker/flight_data.py:221-237))
+  - Added `get_prices()` method for multi-result queries
+
+#### 7.2 Optional Query Parameters
+- ✅ Made target_price optional in query parsing ([flight_tracker/agent.py](flight_tracker/agent.py:32-83))
+  - Only origin, destination, and date are required
+  - target_price, return_date, target_currency, preferred_airlines, max_duration all optional
+  - Updated Claude prompt with clear REQUIRED/OPTIONAL markers
+  - Added examples for queries without price targets
+- ✅ Updated backend to handle optional price filtering ([app.py](app.py:135-186))
+  - If no target_price: shows all 5 results
+  - If target_price specified: filters matching flights, shows up to 5
+  - If no matches: still shows all results with info message
+  - Smart status messages based on whether price target provided
+
+#### 7.3 Enhanced Frontend UI
+- ✅ Multiple flight cards display ([static/app.js](static/app.js:193-281))
+  - New `displayFlightCards()` function renders multiple cards
+  - Results header shows count: "Found X flights"
+  - Each flight displayed in separate card
+  - Smooth rendering of 1-5 results
+- ✅ "Best Deal" badge ([static/app.js](static/app.js:279))
+  - Purple gradient badge on cheapest flight (index 0)
+  - Visual indicator of best price
+  - Only shown on first result in sorted list
+- ✅ Sort functionality ([static/app.js](static/app.js:212-232))
+  - Sort by price (low to high)
+  - Sort by duration (shortest to longest)
+  - Active button highlighting
+  - Client-side sorting (no re-query)
+- ✅ Enhanced flight details ([static/app.js](static/app.js:282-308))
+  - Duration display with format conversion (ISO 8601 → "13h 30m")
+  - Stops information ("Direct", "1 stop", "2 stops")
+  - Duration and stops only shown if available
+- ✅ New CSS styling ([static/style.css](static/style.css:335-384))
+  - Results header with count and sort controls
+  - Sort button styles (hover, active states)
+  - Best Deal badge with gradient and shadow
+  - Spacing between multiple cards
+  - Professional, clean design
+
+#### 7.4 User Experience Improvements
+- ✅ Simplified example queries ([static/index.html](static/index.html:50-65))
+  - Updated subtitle: "Price target is optional!"
+  - Simpler placeholder text
+  - Mix of queries with and without price targets
+  - 4 example buttons for common searches
+- ✅ Smart status messages
+  - "Found 5 flights! Lowest price: $X" (no target)
+  - "Found 3 flights under $Y! Lowest: $X" (with target, matches found)
+  - "No flights under $Y. Showing 5 available options. Lowest: $X" (no matches)
+
+#### 7.5 API Changes
+- ✅ Updated search results structure ([app.py](app.py:54))
+  - Changed `result` (single object) → `results` (array)
+  - Maintains backward compatibility in status endpoint
+- ✅ Response format now includes multiple flights:
+```json
+{
+  "status": "complete",
+  "messages": [...],
+  "results": [
+    {
+      "price": 450.00,
+      "currency": "USD",
+      "airline": "DL",
+      "flight_number": "DL123",
+      "duration": "13h 30m",
+      "stops": 0,
+      ...
+    },
+    ...
+  ]
+}
+```
 
 ---
 
@@ -649,22 +742,41 @@ pytest tests/ --cov=. --cov-report=html
       "content": "Status message"
     }
   ],
-  "result": {
-    "price": 800.00,
-    "currency": "AUD",
-    "original_price": 500.00,
-    "original_currency": "EUR",
-    "airline": "EK",
-    "flight_number": "EK412",
-    "booking_url": "https://...",
-    "trip_type": "round-trip",
-    "departure_date": "2026-06-01",
-    "return_date": "2026-06-30"
-  }
+  "results": [
+    {
+      "price": 450.00,
+      "currency": "AUD",
+      "original_price": 280.00,
+      "original_currency": "EUR",
+      "airline": "EK",
+      "flight_number": "EK412",
+      "booking_url": "https://...",
+      "trip_type": "round-trip",
+      "departure_date": "2026-06-01",
+      "return_date": "2026-06-30",
+      "duration": "13h 30m",
+      "stops": 0
+    },
+    {
+      "price": 520.00,
+      "currency": "AUD",
+      "airline": "QF",
+      "flight_number": "QF9",
+      "booking_url": "https://...",
+      "trip_type": "round-trip",
+      "departure_date": "2026-06-01",
+      "return_date": "2026-06-30",
+      "duration": "15h 45m",
+      "stops": 1
+    }
+    // ... up to 5 flights
+  ]
 }
 ```
 
 **Status Codes**: 200 (success), 404 (search_id not found)
+
+**Note**: Response now includes `results` array (up to 5 flights) instead of single `result` object. Flights are sorted by price (lowest first).
 
 ---
 
@@ -853,9 +965,61 @@ Key next steps would be persistent storage, continuous tracking, and production 
 
 ## TODO:
 
-- Show alternative flight results upto 5 flights that satisfy the search criteria
-- Add payment gateway so that users can book the flights using Amedeus booking API
-- Add user authentication so that users can save their search history and flight bookings. Preferably add OAuth 2.0 based authentication like Google, Facebook etc
-- Add support for multiple currencies
-- Add support for multiple languages
+### ✅ Completed (January 27, 2026)
+- ✅ Show alternative flight results up to 5 flights that satisfy the search criteria
+  - Implemented in Phase 7 with sorting and "Best Deal" badge
+  - Displays duration and stops information
+  - Optional price filtering
+
+### 🚧 In Progress / Planned
+
+#### High Priority (Next Phase)
+- 🔲 Add payment gateway so that users can book flights using Amadeus booking API
+  - Stripe integration for payment processing
+  - Amadeus Flight Order API for actual bookings
+  - Passenger details collection form
+  - Booking confirmation and management
+- 🔲 Add user authentication (OAuth 2.0 - Google, Facebook)
+  - Save search history
+  - Store flight bookings
+  - User preferences (currency, language)
+  - SQLite database for MVP
+
+#### Medium Priority
+- 🔲 Add support for multiple languages (i18n)
+  - Flask-Babel for backend
+  - JSON translation files for frontend
+  - Support: English, Spanish, French, German, Chinese, Japanese
+- ⚠️ Add support for multiple currencies
+  - **Note**: Already implemented! Forex conversion works.
+  - Could enhance: Currency selector in UI, rate caching
+- 🔲 Add persistence layer for user queries
+  - Database: SQLite (MVP) or PostgreSQL (production)
+  - Store searches for 1 week (or longer for authenticated users)
+  - Search history UI component
+
+#### Lower Priority
+- 🔲 Update UI to allow navigation to previous queries/results
+  - Search history panel
+  - Click to re-run previous search
+  - Bookmarking favorite searches
+- 🔲 Mobile-first responsive design
+  - PWA capabilities
+  - Touch-friendly interface
+  - Mobile optimizations
+  - Cross-platform deployment (iOS/Android via PWA or React Native)
+- 🔲 Cloud deployment (AWS)
+  - Elastic Beanstalk or ECS
+  - RDS for database
+  - CloudFront CDN
+  - Route 53 for DNS
+
+### Future Enhancements
+- Airline preference filtering (extracted but not applied)
+- Max duration filtering (extracted but not applied)
+- Price alerts and notifications
+- Price trend charts
+- Calendar view for flexible dates
+- Multi-city flights
+- Seat selection integration
 

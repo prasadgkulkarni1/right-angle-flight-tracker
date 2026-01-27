@@ -332,12 +332,63 @@ body {
     color: var(--error-red);
 }
 
+/* Results Header */
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+}
+
+.results-count {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.sort-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.sort-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background: var(--dark-blue);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.sort-btn:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+    border-color: var(--sky-blue);
+}
+
+.sort-btn.active {
+    background: var(--sky-blue);
+    color: white;
+    border-color: var(--sky-blue);
+}
+
 /* Flight Card - Skyscanner Style */
 .flight-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 24px;
+    margin-bottom: 1rem;  /* Add spacing between cards */
     box-shadow: var(--shadow-lg);
     transition: all 0.2s;
 }
@@ -390,6 +441,13 @@ body {
 .badge-type {
     background: rgba(7, 112, 227, 0.15);
     color: var(--sky-blue);
+}
+
+.badge-best {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .flight-details {
