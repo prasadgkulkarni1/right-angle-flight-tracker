@@ -24,6 +24,14 @@ def serve_static(filename):
     """Explicitly serve static files."""
     return send_from_directory('static', filename)
 
+@app.route('/sw.js')
+def serve_service_worker():
+    """Serve the service worker from root scope so it can control all pages."""
+    response = send_from_directory('static', 'sw.js')
+    response.headers['Service-Worker-Allowed'] = '/'
+    response.headers['Content-Type'] = 'application/javascript'
+    return response
+
 @app.route('/api/providers', methods=['GET'])
 def get_providers():
     """Get list of available flight data providers."""

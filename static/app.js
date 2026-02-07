@@ -8,6 +8,15 @@ let currentSearchId = null;
 let isSearching = false;
 let availableProviders = [];
 
+// Register service worker for PWA support
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service worker registered:', reg.scope))
+            .catch(err => console.warn('Service worker registration failed:', err));
+    });
+}
+
 // Load available providers on page load
 async function loadProviders() {
     try {
