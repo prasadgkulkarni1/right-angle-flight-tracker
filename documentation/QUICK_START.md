@@ -107,7 +107,7 @@ ls -la *.sh
 
 Once running, you'll see:
 ```
-🚀 Flight Tracker Web UI starting...
+🚀 Flights Finder Web UI starting...
 📍 Open http://localhost:5001 in your browser
 📍 Or access via http://127.0.0.1:5001
 ```

@@ -1,4 +1,4 @@
-# Flight Tracker Project - Development History
+# Flights Finder Project - Development History
 
 > **Context Document for Claude Code Sessions**
 >
@@ -8,7 +8,7 @@
 
 ## Project Overview
 
-**Name**: Flight Tracker (binary-aldrin)
+**Name**: Flights Finder (binary-aldrin)
 **Framework**: Google Antigravity
 **Primary AI**: Anthropic Claude Opus 4.5
 **Status**: MVP Complete ✅

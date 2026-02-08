@@ -32,7 +32,7 @@ def test_static_serving():
             if response.status_code == 200:
                 if len(response.text) > 0:
                     print(f"   Content length: {len(response.text)} bytes")
-                    if "Flight Tracker" in response.text:
+                    if "Flights Finder" in response.text:
                         print("   ✅ HTML content looks good")
                     else:
                         print("   ❌ HTML missing expected content")

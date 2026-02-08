@@ -2,7 +2,7 @@
 
 ## ✅ All Tests Passing: 68/68
 
-Complete test coverage has been implemented for the Flight Tracker application, covering all scenarios identified in [CLAUDE.md](CLAUDE.md).
+Complete test coverage has been implemented for the Flights Finder application, covering all scenarios identified in [CLAUDE.md](CLAUDE.md).
 
 ---
 

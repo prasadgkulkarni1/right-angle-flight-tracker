@@ -7,7 +7,7 @@ from flight_tracker.provider_factory import ProviderFactory
 from flight_tracker.config import config
 
 def main():
-    """Main entry point for the Flight Tracker application.
+    """Main entry point for the Flights Finder application.
     
     Parses command-line arguments, sets up the FlightTool and PriceTrackerAgent,
     and starts the tracking process.

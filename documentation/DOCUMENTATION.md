@@ -1,8 +1,8 @@
-# Flight Tracker Application - Technical Documentation
+# Flights Finder Application - Technical Documentation
 
 ## Overview
 
-This Flight Tracker application is built using Google's Antigravity framework and leverages **Anthropic's Claude AI** to create an intelligent flight price tracking system. The application uses natural language processing to understand user queries and can search for flights using either mock data or real flight information from the Amadeus API.
+This Flights Finder application is built using Google's Antigravity framework and leverages **Anthropic's Claude AI** to create an intelligent flight price tracking system. The application uses natural language processing to understand user queries and can search for flights using either mock data or real flight information from the Amadeus API.
 
 ### Key Technologies
 - **Backend**: Flask (Python web framework)
@@ -860,7 +860,7 @@ python debug_auth.py
 
 ## Conclusion
 
-This Flight Tracker application demonstrates effective integration of:
+This Flights Finder application demonstrates effective integration of:
 - **AI-powered natural language understanding** via Anthropic Claude
 - **Modular architecture** with provider abstraction
 - **Real-world API integration** (Amadeus)

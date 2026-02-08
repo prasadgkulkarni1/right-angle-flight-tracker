@@ -30,6 +30,9 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    overscroll-behavior-y: contain;
 }
 
 .container {
@@ -52,6 +55,9 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 16px 24px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -143,6 +149,9 @@ body {
     width: 100%;
     margin: 0 auto;
     padding: 32px 24px;
+    padding-bottom: max(32px, env(safe-area-inset-bottom));
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
 }
 
 /* Search Section */
@@ -608,10 +617,19 @@ body {
 @media (max-width: 480px) {
     .main {
         padding: 16px 16px;
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
     }
 
     .search-section {
         padding: 20px;
+    }
+
+    .search-title {
+        font-size: 20px;
+    }
+
+    .search-subtitle {
+        font-size: 13px;
     }
 
     .example-queries {
@@ -621,5 +639,68 @@ body {
     .example-btn {
         width: 100%;
         text-align: left;
+    }
+
+    .logo-icon {
+        font-size: 22px;
+    }
+
+    .logo h1 {
+        font-size: 18px;
+    }
+
+    .provider-selector {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .provider-select {
+        min-width: unset;
+        width: 100%;
+    }
+}
+
+/* Touch-friendly minimum tap targets (44x44 per Apple HIG) */
+@media (pointer: coarse) {
+    .send-btn,
+    .book-btn,
+    .example-btn {
+        min-height: 48px;
+    }
+
+    .provider-select {
+        min-height: 44px;
+    }
+
+    #queryInput {
+        font-size: 16px; /* prevents iOS zoom on focus */
+    }
+}
+
+/* Standalone PWA mode adjustments */
+@media (display-mode: standalone) {
+    .header {
+        padding-top: env(safe-area-inset-top);
+    }
+}
+
+/* Landscape on small devices */
+@media (max-height: 500px) and (orientation: landscape) {
+    .search-section {
+        padding: 16px;
+    }
+
+    .search-title {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .search-subtitle {
+        margin-bottom: 12px;
+        font-size: 13px;
+    }
+
+    .example-section {
+        margin-top: 12px;
     }
 }

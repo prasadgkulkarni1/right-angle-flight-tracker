@@ -2,7 +2,7 @@
 
 ## ✅ Completed Successfully
 
-The Flight Tracker application has been refactored to support a flexible, extensible provider configuration system.
+The Flights Finder application has been refactored to support a flexible, extensible provider configuration system.
 
 ## What Changed
 

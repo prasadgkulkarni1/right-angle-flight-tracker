@@ -157,7 +157,7 @@ def main():
     print("\n" + "="*60)
     print("FLIGHT TRACKER UI DIAGNOSTIC")
     print("="*60)
-    print("\nThis script checks common issues with the Flight Tracker UI.")
+    print("\nThis script checks common issues with the Flights Finder UI.")
     print("Make sure Flask is running in another terminal!\n")
 
     results = []
