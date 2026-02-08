@@ -39,7 +39,7 @@ class TestAPIEndpoints(unittest.TestCase):
         response = self.client.get('/')
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Flight Tracker', response.data)
+        self.assertIn(b'Flights Finder', response.data)
 
         print("✓ Index route returns HTML successfully")
 

@@ -67,7 +67,7 @@ Open browser DevTools (F12 or Cmd+Option+I) and check:
 python app.py
 
 # Should see:
-# 🚀 Flight Tracker Web UI starting...
+# 🚀 Flights Finder Web UI starting...
 # 📍 Open http://localhost:5000 in your browser
 # * Running on http://127.0.0.1:5000
 ```

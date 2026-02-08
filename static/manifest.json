@@ -1,6 +1,6 @@
 {
-  "name": "Flight Tracker - Find Your Perfect Flight",
-  "short_name": "Flight Tracker",
+  "name": "Flights Finder - Find Your Perfect Flight",
+  "short_name": "Flights Finder",
   "description": "Intelligent flight price tracking with natural language search",
   "start_url": "/",
   "display": "standalone",

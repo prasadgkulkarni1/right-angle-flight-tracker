@@ -1,10 +1,10 @@
 # Flight Data Provider Configuration Guide
 
-This guide explains how to configure different flight data providers for the Flight Tracker application.
+This guide explains how to configure different flight data providers for the Flights Finder application.
 
 ## Overview
 
-The Flight Tracker supports multiple flight data providers through a flexible configuration system. Each provider can be enabled/disabled and requires specific API credentials.
+The Flights Finder supports multiple flight data providers through a flexible configuration system. Each provider can be enabled/disabled and requires specific API credentials.
 
 ## Architecture
 

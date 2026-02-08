@@ -1,6 +1,6 @@
 # Test Suite
 
-Comprehensive test coverage for the Flight Tracker application.
+Comprehensive test coverage for the Flights Finder application.
 
 ## Test Files
 

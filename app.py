@@ -24,12 +24,13 @@ def serve_static(filename):
     """Explicitly serve static files."""
     return send_from_directory('static', filename)
 
-@app.route('/sw.js')
+@app.route('/sw.min.js')
 def serve_service_worker():
-    """Serve the service worker from root scope so it can control all pages."""
-    response = send_from_directory('static', 'sw.js')
+    """Serve the minified service worker from root scope so it can control all pages."""
+    response = send_from_directory('static', 'sw.min.js')
     response.headers['Service-Worker-Allowed'] = '/'
     response.headers['Content-Type'] = 'application/javascript'
+    response.headers['Cache-Control'] = 'no-cache'
     return response
 
 @app.route('/api/providers', methods=['GET'])
@@ -248,7 +249,7 @@ if __name__ == '__main__':
     # Support configurable port via environment variable or default to 5000
     port = int(os.environ.get('PORT', 5000))
 
-    print("🚀 Flight Tracker Web UI starting...")
+    print("🚀 Flights Finder Web UI starting...")
     print(f"📍 Open http://localhost:{port} in your browser")
     print(f"📍 Or access via http://127.0.0.1:{port}")
 

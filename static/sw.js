@@ -1,8 +1,8 @@
-const CACHE_NAME = 'flight-tracker-v1';
+const CACHE_NAME = 'flights-finder-v2';
 const STATIC_ASSETS = [
   '/',
   '/static/style.css',
-  '/static/app.js',
+  '/static/app.min.js',
   '/static/icons/icon-192.png',
   '/static/icons/icon-512.png'
 ];

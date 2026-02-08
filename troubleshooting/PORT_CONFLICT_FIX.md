@@ -73,7 +73,7 @@ I'll update app.py to support PORT environment variable:
 ```python
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print(f"🚀 Flight Tracker Web UI starting on port {port}...")
+    print(f"🚀 Flights Finder Web UI starting on port {port}...")
 ```
 
 ### Usage Examples

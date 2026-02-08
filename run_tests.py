@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Master test runner for Flight Tracker application.
+Master test runner for Flights Finder application.
 
 Runs all tests and provides a summary of results.
 """
